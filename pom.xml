@@ -13,7 +13,7 @@
   </parent>
 
   <properties>
-    <jdk.version>15</jdk.version>
+    <jdk.version>11</jdk.version>
     <release.version>${jdk.version}</release.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -213,8 +213,6 @@
             <arg>-Amicronaut.processing.group=com.baseggio.udemy</arg>
             <arg>-Amicronaut.processing.module=mn-stock-broker</arg>
           </compilerArgs>
-          <source>11</source>
-          <target>11</target>
         </configuration>
         <executions>
           <execution>
@@ -246,6 +244,5 @@
       </plugin>
     </plugins>
   </build>
-
 
 </project>

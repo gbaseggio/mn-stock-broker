@@ -2,6 +2,9 @@ package com.baseggio.udemy.broker.controller;
 
 import com.baseggio.udemy.broker.model.CustomError;
 import com.baseggio.udemy.broker.model.Quote;
+import com.baseggio.udemy.broker.persistence.QuoteEntity;
+import com.baseggio.udemy.broker.persistence.QuotesRepository;
+import com.baseggio.udemy.broker.persistence.SymbolEntity;
 import com.baseggio.udemy.broker.store.InMemoryStore;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
@@ -16,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.util.List;
 import java.util.Optional;
 
 @Secured(SecurityRule.IS_ANONYMOUS)
@@ -23,9 +27,11 @@ import java.util.Optional;
 public class QuotesController {
 
     private final InMemoryStore store;
+    private final QuotesRepository quotesRepository;
 
-    public QuotesController(InMemoryStore store) {
+    public QuotesController(InMemoryStore store, QuotesRepository quotesRepository) {
         this.store = store;
+        this.quotesRepository = quotesRepository;
     }
 
     @Operation(summary = "Returns a quote for the given symbol")
@@ -47,4 +53,27 @@ public class QuotesController {
         return HttpResponse.ok(maybeQuote.get());
     }
 
+    @Get("/jpa")
+    public List<QuoteEntity> getAllQuotesViaJPA(){
+        return quotesRepository.findAll();
+    }
+
+    @Operation(summary = "Returns a quote for the given symbol. Fetched via JPA.")
+    @ApiResponse(content = @Content(mediaType = MediaType.APPLICATION_JSON))
+    @ApiResponse(responseCode = "400", description = "Invalid Symbol specified")
+    @Tag(name = "quotes")
+    @Get("/jpa/{symbol}")
+    public HttpResponse getQuoteViaJPA(@PathVariable String symbol) {
+        final Optional<QuoteEntity> maybeQuote = quotesRepository.findBySymbol(new SymbolEntity(symbol));
+        if (maybeQuote.isEmpty()) {
+            final CustomError notFound = CustomError.builder()
+                    .status(HttpStatus.NOT_FOUND.getCode())
+                    .error(HttpStatus.NOT_FOUND.name())
+                    .message("Quote for symbol not available in database.")
+                    .path("/quote/jpa/" + symbol)
+                    .build();
+            return HttpResponse.notFound(notFound);
+        }
+        return HttpResponse.ok(maybeQuote.get());
+    }
 }
