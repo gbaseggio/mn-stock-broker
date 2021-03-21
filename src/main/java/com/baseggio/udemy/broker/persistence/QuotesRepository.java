@@ -5,6 +5,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import io.micronaut.data.annotation.Repository;
 import io.micronaut.data.repository.CrudRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,4 +16,13 @@ public interface QuotesRepository extends CrudRepository<QuoteEntity, String> {
     List<QuoteEntity> findAll();
 
     Optional<QuoteEntity> findBySymbol(SymbolEntity symbol);
+
+    // Ordering
+    List<QuoteDTO> listOrderByVolumeDesc();
+
+    List<QuoteDTO> listOrderByVolumeAsc();
+
+    // Filter
+    List<QuoteDTO> findByVolumeGreaterThanOrderByVolumeAsc(BigDecimal volume);
+
 }

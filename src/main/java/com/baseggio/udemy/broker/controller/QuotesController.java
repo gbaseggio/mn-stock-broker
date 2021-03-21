@@ -2,6 +2,7 @@ package com.baseggio.udemy.broker.controller;
 
 import com.baseggio.udemy.broker.model.CustomError;
 import com.baseggio.udemy.broker.model.Quote;
+import com.baseggio.udemy.broker.persistence.QuoteDTO;
 import com.baseggio.udemy.broker.persistence.QuoteEntity;
 import com.baseggio.udemy.broker.persistence.QuotesRepository;
 import com.baseggio.udemy.broker.persistence.SymbolEntity;
@@ -19,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,5 +77,20 @@ public class QuotesController {
             return HttpResponse.notFound(notFound);
         }
         return HttpResponse.ok(maybeQuote.get());
+    }
+
+    @Get("/jpa/ordered/desc")
+    public List<QuoteDTO> ordered() {
+        return quotesRepository.listOrderByVolumeDesc();
+    }
+
+    @Get("/jpa/ordered/asc")
+    public List<QuoteDTO> orderedasc() {
+        return quotesRepository.listOrderByVolumeAsc();
+    }
+
+    @Get("/jpa/volume/{volume}")
+    public List<QuoteDTO> filterByVolume(@PathVariable BigDecimal volume) {
+        return quotesRepository.findByVolumeGreaterThanOrderByVolumeAsc(volume);
     }
 }
